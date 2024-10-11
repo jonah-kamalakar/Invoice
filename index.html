@@ -96,7 +96,7 @@
             td4.innerText = rate;
             let total = 0;
             let rates = document.querySelectorAll('.rate');
-            rates.forEach((e) => { console.log(total); total = total + Number(e.innerText); console.log(total); console.log('total'); document.querySelector('.tableFooterCell:nth-child(4)').innerText = `$ ${total}`; });
+            rates.forEach((e) => { console.log(total); total = total + Number(e.innerText); console.log(total); console.log('total'); document.querySelector('.tableFooterCell:nth-child(2)').innerText = `$ ${total}`; });
             document.querySelector('#download-button').disabled = false;
         }
         function enableButton() {
