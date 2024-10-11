@@ -96,7 +96,7 @@
             td4.innerText = rate;
             let total = 0;
             let rates = document.querySelectorAll('.rate');
-            rates.forEach((e) => { console.log(total); total = total + Number(e.innerText); console.log(total); console.log('total'); document.querySelector('.tableFooterCell:nth-child(2)').innerText = `$ ${total}`; });
+            rates.forEach((e) => { console.log(total); total = total + Number(e.innerText); console.log(total); console.log('total'); document.querySelector('.tableFooterCell:nth-child(2)').innerText = `INR ${total}`; });
             document.querySelector('#download-button').disabled = false;
         }
         function enableButton() {
@@ -203,7 +203,7 @@
                         <th>Description</th>
                         <!-- <th>From</th>
                         <th>To</th> -->
-                        <th>Amount (in USD)</th>
+                        <th>Amount (in INR)</th>
                     </tr>
                     <tr class="tableMainEmpty">
                         <td class="tableMainCell"></td>
