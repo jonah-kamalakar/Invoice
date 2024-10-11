@@ -69,8 +69,8 @@
         function additem() {
             let particular = document.querySelector('#invoice-particular').value;
             let rate = document.querySelector('#invoice-rate').value;
-            let from_date = document.querySelector('#invoice-from-date').value;
-            let to_date = document.querySelector('#invoice-to-date').value;
+            // let from_date = document.querySelector('#invoice-from-date').value;
+            // let to_date = document.querySelector('#invoice-to-date').value;
             if (document.querySelector('.tableMainEmpty') != null) {
                 document.querySelector('.tableMainEmpty').remove();
             }
@@ -91,8 +91,8 @@
             td2.classList.add('tableMainCell');
             td4.classList.add('rate');
             td1.innerText = particular;
-            td2.innerText = from_date;
-            td3.innerText = to_date;
+            // td2.innerText = from_date;
+            // td3.innerText = to_date;
             td4.innerText = rate;
             let total = 0;
             let rates = document.querySelectorAll('.rate');
