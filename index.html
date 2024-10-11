@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Invoice generator</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            let clients = [];
+            function startInvoice() {
+                url = "clients.json";
+                const select = document.querySelector("#customerList");
+                var getJSON = function (url, callback) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'json';
+                    xhr.onload = function () {
+                        var status = xhr.status;
+                        if (status === 200) {
+                            callback(null, xhr.response);
+                        } else {
+                            callback(status, xhr.response);
+                        }
+                    };
+                    xhr.send();
+                };
+                getJSON(url,
+                    function (err, data) {
+                        if (err !== null) {
+                            console.log('Something went wrong: ' + err);
+                        } else {
+                            clients = data;
+                            console.log(clients);
+                            clients.forEach((el) => {
+                                let option = document.createElement("option");
+                                option.innerText = el.DBname;
+                                select.add(option)
+                            });
+                        }
+                    });
+                let date = new Date();
+                document.querySelector('.invoiceDate p:nth-child(2)').innerText = `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()} ${date.getFullYear()}`;
+                let paymentDate = new Date(date);
+                paymentDate.setDate(paymentDate.getDate() + 7);
+                document.querySelector('.invoicePayment p:nth-child(2)').innerText = `${paymentDate.toLocaleString('default', { month: 'long' })} ${paymentDate.getDate()} ${paymentDate.getFullYear()}`;
+            }
+            function setupClient() {
+                const select = document.querySelector("#customerList");
+                let activeClient = {};
+                clients.forEach((el) => {
+                    if (el.DBname === select.value) {
+                        activeClient = el;
+                    }
+                })
+                console.log(activeClient);
+                document.querySelector('.payerPOC').innerText = activeClient.pocName;
+                document.querySelector('.payerEmail').innerText = activeClient.email;
+                document.querySelector('.payerCompany').innerText = activeClient.name.toUpperCase();
+                document.querySelector('.payerAddress').innerText = activeClient.address;
+                let date = new Date();
+                let id = `${activeClient.id}000${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}`;
+                document.querySelector('.invoiceNo p:nth-child(2)').innerText = id;
+            }
+            function additem() {
+                let particular = document.querySelector('#invoice-particular').value;
+                let rate = document.querySelector('#invoice-rate').value;
+                let from_date = document.querySelector('#invoice-from-date').value;
+                let to_date = document.querySelector('#invoice-to-date').value;
+                if (document.querySelector('.tableMainEmpty') != null) {
+                    document.querySelector('.tableMainEmpty').remove();
+                }
+                let tableFooter = document.querySelector('.tableFooter');
+                let table = document.querySelector(".invoiceTable tbody");
+                let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                let td2 = document.createElement("td");
+                let td3 = document.createElement("td");
+                let td4 = document.createElement("td");
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+                tr.appendChild(td4);
+                table.insertBefore(tr, tableFooter);
+                tr.classList.add('tableMain');
+                td1.classList.add('tableMainCell');
+                td2.classList.add('tableMainCell');
+                td4.classList.add('rate');
+                td1.innerText = particular;
+                td2.innerText = from_date;
+                td3.innerText = to_date;
+                td4.innerText = rate;
+                let total = 0;
+                let rates = document.querySelectorAll('.rate');
+                rates.forEach((e) => { console.log(total); total = total + Number(e.innerText); console.log(total); console.log('total'); document.querySelector('.tableFooterCell:nth-child(4)').innerText = `$ ${total}`; });
+                document.querySelector('#download-button').disabled = false;
+            }
+            function enableButton() {
+                if (document.querySelector('#invoice-rate').value !== '') {
+                    document.querySelector('#addItem').disabled = false;
+                } else {
+                    document.querySelector('#addItem').disabled = true;
+                }
+            }
+            function generatePDF() {
+                // Choose the element that your content will be rendered to.
+                const element = document.getElementById('invoice');
+                element.style.border = 'none';
+                let fileName = `${document.querySelector("#customerList").value}_${document.querySelector('.invoiceNo p:nth-child(2)').innerText}`;
+                var opt = {
+                    margin: [0, 0],
+                    filename: fileName,
+                    html2canvas: { scale: 4, x: 500, y: 600 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'p' }
+                };
+                // Choose the element and save the PDF for your user.
+                html2pdf().set(opt).from(element).save();
+            }
+        </script>
+    </head>
+
+    <body onload="startInvoice()">
+        <div class="container">
+            <section class="form">
+                <div class="select-customer-form">
+                    <p>Select Customer</p>
+                    <select name="customer" id="customerList" onchange="setupClient()">
+                        <option value="0">Select Customer</option>
+                    </select>
+                </div>
+                <div class="input-particulars-form">
+                    <div>
+                        <p>Add item</p>
+                        <div>
+                            <input type="text" name="invoice-particular" id="invoice-particular" placeholder="Description">
+                            <input type="text" name="invoice-rate" id="invoice-rate" placeholder="Amount" onkeyup="enableButton()">
+                            <input type="text" name="invoice-from-date" id="invoice-from-date" placeholder="01/01/2023" onkeyup="enableButton()">
+                            <input type="text" name="invoice-to-date" id="invoice-to-date" placeholder="01/01/2023" onkeyup="enableButton()">
+                            <button disabled id="addItem" onclick="additem()">+</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="invoice" id="invoice">
+                <div class="payeeDetails">
+                    <div class="payeeInfo">
+                        <h2>Jonah Kamalakar Nishanam</h2>
+                        <p>106, Anant Krupa, Kopar Cross Road, Shastri nagar</p>
+                        <p>Dombivli (west), Thane, Maharashtra, India, 421202</p>
+                        <p>+91-7406745276</p>
+                    </div>
+                    <div class="payeeLogo">
+                        <h3>Invoice</h3>
+                    </div>
+                </div>
+                <div class="payerDetails">
+                    <div class="payerInfo">
+                        <p>Bill To :</p>
+                        <p class="payerPOC">Payer Name</p>
+                        <p class="payerEmail">Payer Email</p>
+                        <p class="payerCompany">Payer Company</p>
+                        <p class="payerAddress">Payer Address</p>
+                    </div>
+                    <div class="invoiceDates">
+                        <div>
+                            <p style="color:white">Spacer</p>
+                        </div>
+                        <div class="invoiceDate">
+                            <p>Date :</p>
+                            <p>March 10, 2023</p>
+                        </div>
+                        <div class="invoiceNo">
+                            <p>Invoice # :</p>
+                            <p>0000000000</p>
+                        </div>
+                        <div class="invoicePayment">
+                            <p>Payment Due By :</p>
+                            <p>March 17, 2023</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="invoiceMain">
+                    <table class="invoiceTable">
+                        <tr>
+                            <th>Description</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount (in USD)</th>
+                        </tr>
+                        <tr class="tableMainEmpty">
+                            <td class="tableMainCell"></td>
+                            <td class="tableMainCell"></td>
+                            <td class="tableMainCell"></td>
+                            <td class="tableMainCell"></td>
+                        </tr>
+                        <tr class="tableFooter">
+                            <td class="tableFooterCell">Total</td>
+                            <td class="tableFooterCell"></td>
+                            <td class="tableFooterCell"></td>
+                            <td class="tableFooterCell">$ 0</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="invoicePaymentDetails">
+                    <h4>RTGS / NEFT Details</h4>
+                    <p>Name: <strong>Nishanam Jonah Kamalakar</strong></p>
+                    <p>Bank Name: <strong>State bank of India</strong></p>
+                    <p>A/c Number: <strong>31561202373</strong></p>
+                    <p>IFSC Code: <strong>SBIN0005165</strong></p>
+                    <p>SWIFT/BIC: <strong>SBININBB236</strong></p>
+                    <p>Branch: <strong>Dombivli West</strong></p>
+                    <p>Paytm / Google Pay : <strong>7406745276</strong></p>
+                </div>
+                <div class="invoiceGreetings">
+                    <p>For Name</p>
+                    <p>Jonah Kamalakar Nishanam</p>
+                    <img src="sign.png" alt="">
+                    <p>Authorised Signatory</p>
+                </div>
+            </section>
+            <section class="invoiceBtns">
+                <button id="download-button" onclick="generatePDF()">Download PDF</button>
+            </section>
+        </div>
+    </body>
+
+</html>

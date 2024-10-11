@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "DBname": "Jia",
+    "name": "VAZIFDARS HOSPITALITY LLP",
+    "pocName": "Urvi Patel",
+    "email": "urvi.royalchina@gmail.com",
+    "address": "Mumbai"
+  },
+  {
+    "id": "2",
+    "DBname": "Royal China",
+    "name": "Royal China",
+    "pocName": "Urvi Patel",
+    "email": "urvi.royalchina@gmail.com",
+    "address": "Mumbai"
+  },
+  {
+    "id": "3",
+    "DBname": "Kuai Kitchen",
+    "name": "PALLADIAN HOSPITALITY LLP",
+    "pocName": "Urvi Patel",
+    "email": "urvi.royalchina@gmail.com",
+    "address": "Mumbai"
+  },
+  {
+    "id": "4",
+    "DBname": "Doola",
+    "name": "DOOLA",
+    "pocName": "finance@doola.com",
+    "email": "finance@doola.com",
+    "address": "US"
+  }
+]
