@@ -106,31 +106,69 @@
                 document.querySelector('#addItem').disabled = true;
             }
         }
-        function generatePDF() {
-            // Choose the element that your content will be rendered to.
+        window.addEventListener("resize",()=>{
             const element = document.getElementById('invoice');
-            element.style.border = 'none';
+            const absolutePosition = getAbsolutePosition(element);
+            console.log(absolutePosition);
+            function getAbsolutePosition(element) {
+                let x = element.offsetLeft;
+                let y = element.offsetTop;
+                let parent = element.offsetParent;
+                while (parent) {
+                    x += parent.offsetLeft;
+                    y += parent.offsetTop;
+                    parent = parent.offsetParent;
+                }
+                return { x, y };
+            }
+            const rect = element.getBoundingClientRect();
+            const width = rect.width/2;
+            const height = rect.height/2;
+            console.log(width, height)
+        })
+        function generatePDF() {
+            const element = document.getElementById('invoice');
+            // Choose the element that your content will be rendered to.
+            const clientForm = document.querySelector(".form")
             let fileName = `${document.querySelector("#customerList").value}_${document.querySelector('.invoiceNo p:nth-child(2)').innerText}`;
 
             // Get the element's actual width
             const elementWidth = element.offsetWidth;
+            const elementHeight = element.offsetHeight;
 
             // Set PDF width to A4 size (595 points)
             const a4Width = 595;
-            const scale = a4Width / elementWidth; // Calculate the necessary scale to fit the element
+            const scale = elementWidth / a4Width; // Calculate the necessary scale to fit the element
 
-            element.scrollIntoView();
+            const absolutePosition = getAbsolutePosition(element);
+            console.log(absolutePosition);
+            function getAbsolutePosition(element) {
+                let x = element.offsetLeft;
+                let y = element.offsetTop;
+                let parent = element.offsetParent;
+                while (parent) {
+                    x += parent.offsetLeft;
+                    y += parent.offsetTop;
+                    parent = parent.offsetParent;
+                }
+                return { x, y };
+            }
+            const rect = element.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            console.log(width, height)
 
-
+            element.scrollIntoView()
             var opt = {
-                margin: [0, 0],
+                margin: 1,
                 filename: fileName,
-                html2canvas: { scale: scale, x: 0, y: 0 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'p' }
+                html2canvas: { scale: 5, x:300},
+                jsPDF: { unit: 'px', format: 'a4', orientation: 'portrait' }
             };
             // Choose the element and save the PDF for your user.
-            html2pdf().set(opt).from(element).save();
+            html2pdf(element).set(opt).save();
         }
+
     </script>
 </head>
 
@@ -236,9 +274,12 @@
                 <p>Authorised Signatory</p>
             </div>
         </section>
+
         <section class="invoiceBtns">
             <button id="download-button" onclick="generatePDF()">Download PDF</button>
         </section>
+
+
     </div>
 </body>
 
